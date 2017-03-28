@@ -1,0 +1,9 @@
+# Documentation
+#
+# mesh [mesh_name] // represents start of mesh object
+# vertex [x y z] // represents single vertex of mesh
+# uv1 [s t] // represents vertex uv set 1 position
+# uv2 [s t] // represents vertex uv set 2 position
+# face [vertex1 vertex2 vertex3] // represents face of a mesh, contains indices for vertecies
+# diffuseTexture [url] // represents mesh diffuse texture
+# lightmapTexture [url] // represents mesh lightmap texture
