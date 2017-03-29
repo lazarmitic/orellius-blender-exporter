@@ -50,9 +50,9 @@ def convertGeometryDataToVBOFormat(vertices, uvs, faces):
     for i,face in enumerate(faces):
         vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i].s, uvs[i].t)
         VBOData.append(vertexData)
-        vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i + 1].s, uvs[i + 1].t)
+        vertexData = VertexData(vertices[face.b].x, vertices[face.b].y, vertices[face.b].z, uvs[i + 1].s, uvs[i + 1].t)
         VBOData.append(vertexData)
-        vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i + 2].s, uvs[i + 2].t)
+        vertexData = VertexData(vertices[face.c].x, vertices[face.c].y, vertices[face.c].z, uvs[i + 2].s, uvs[i + 2].t)
         VBOData.append(vertexData)
 
     return VBOData
