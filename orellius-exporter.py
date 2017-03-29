@@ -14,6 +14,49 @@ bl_info = {
 	"category": "Import-Export"
 }
 
+class Face(object):
+
+	def __init__(self, a, b, c):
+		self.a = a
+		self.b = b
+		self.c = c
+
+class Vertex(object):
+
+	def __init__(self, x, y, z):
+		self.x = x
+		self.y = y
+		self.z = z
+
+class Uv(object):
+
+	def __init__(self, s, t):
+		self.s = s
+		self.t = t
+
+class VertexData(object):
+    
+    def __init__(self, x, y, z, s, t):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.s = s
+        self.t = t
+
+def convertGeometryDataToVBOFormat(vertices, uvs, faces):
+
+    VBOData = []
+    
+    for i,face in enumerate(faces):
+        vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i].s, uvs[i].t)
+        VBOData.append(vertexData)
+        vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i + 1].s, uvs[i + 1].t)
+        VBOData.append(vertexData)
+        vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i + 2].s, uvs[i + 2].t)
+        VBOData.append(vertexData)
+
+    return VBOData
+
 class ExportOrelliusMesh(bpy.types.Operator, ExportHelper):
 	"""Export Orellius mesh"""
 
@@ -26,12 +69,16 @@ class ExportOrelliusMesh(bpy.types.Operator, ExportHelper):
 
 def save(operator, context, filepath):
 
-	filepath = os.fsencode(filepath)
+	filepath = os.fsencode("/home/lazar/Desktop/test.orl")
 	fp = open(filepath, 'w')
 
 	for sceneObject in bpy.context.scene.objects:
 		if sceneObject.type == "MESH":
 			fp.write("mesh " + sceneObject.name + "\n")
+
+			vertexList = []
+			uvList = []
+			faceList = []
 
 			mesh = bmesh.new()
 			mesh.from_mesh(sceneObject.data)
@@ -39,16 +86,27 @@ def save(operator, context, filepath):
 			mesh.to_mesh(sceneObject.data)
 
 			for vertex in sceneObject.data.vertices:
-				fp.write("vertex " + str(vertex.co.x) + " " + str(vertex.co.y) + " " + str(vertex.co.z) + "\n")
+				#fp.write("vertex " + str(vertex.co.x) + " " + str(vertex.co.y) + " " + str(vertex.co.z) + "\n")
+				vertexObject = Vertex(vertex.co.x, vertex.co.y, vertex.co.z)
+				vertexList.append(vertexObject)
 
 			uv_layer = mesh.loops.layers.uv.active
 			for face in mesh.faces:
 				for vert in face.loops:
-					fp.write("uv1 " + str(vert[uv_layer].uv.x) + " " + str(vert[uv_layer].uv.y) + "\n")
+					#fp.write("uv1 " + str(vert[uv_layer].uv.x) + " " + str(vert[uv_layer].uv.y) + "\n")
+					uvObject = Uv(vert[uv_layer].uv.x, vert[uv_layer].uv.y)
+					uvList.append(uvObject)
 
 			for face in sceneObject.data.polygons:
-				fp.write("face " + str(face.vertices[0]) + " " + str(face.vertices[1]) + " " + str(face.vertices[2]) + "\n")
+				#fp.write("face " + str(face.vertices[0]) + " " + str(face.vertices[1]) + " " + str(face.vertices[2]) + "\n")
+				faceObject = Face(face.vertices[0], face.vertices[1], face.vertices[2])
+				faceList.append(faceObject)
 
+			VBO = convertGeometryDataToVBOFormat(vertexList, uvList, faceList)
+			
+			for vboEntry in VBO:
+				fp.write(str(vboEntry.x) + " " + str(vboEntry.y) + " " + str(vboEntry.z) + " " + str(vboEntry.s) + " " + str(vboEntry.t) + "\n")
+			
 			for material in sceneObject.material_slots:
 				for texture in material.material.texture_slots:
 					if texture:
