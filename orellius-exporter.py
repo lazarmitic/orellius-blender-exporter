@@ -105,7 +105,7 @@ def save(operator, context, filepath):
 			VBO = convertGeometryDataToVBOFormat(vertexList, uvList, faceList)
 			
 			for vboEntry in VBO:
-				fp.write(str(vboEntry.x) + " " + str(vboEntry.y) + " " + str(vboEntry.z) + " " + str(vboEntry.s) + " " + str(vboEntry.t) + "\n")
+				fp.write("v " + str(round(vboEntry.x, 2)) + " " + str(round(vboEntry.y, 2)) + " " + str(round(vboEntry.z, 2)) + " " + str(round(vboEntry.s, 2)) + " " + str(round(vboEntry.t, 2)) + "\n")
 			
 			for material in sceneObject.material_slots:
 				for texture in material.material.texture_slots:
