@@ -2,5 +2,6 @@
 #
 # mesh [mesh_name] // represents start of mesh object
 # vertexData [x, y, z, s, t, s, t] //represents vertex in format same as VBO format that we send to GPU for rendering
+# indiceData [a, b, c, a, b, c...] // tells GPU how to connect vertices to form triangles
 # diffuseTexture [url] // represents mesh diffuse texture
 # lightmapTexture [url] // represents mesh lightmap texture
