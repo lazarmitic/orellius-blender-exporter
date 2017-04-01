@@ -35,61 +35,61 @@ class Uv(object):
 		self.t = t
 
 class VertexData(object):
-    
-    def __init__(self, x, y, z, s, t):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.s = s
-        self.t = t
+	
+	def __init__(self, x, y, z, s, t):
+		self.x = x
+		self.y = y
+		self.z = z
+		self.s = s
+		self.t = t
 
 	def __eq__(self, other): 
-        return self.__dict__ == other.__dict__
+		return self.__dict__ == other.__dict__
 
 def checkIfVertexAlreadyExists(VBOData, vertex):
 
-    for i,vert in enumerate(VBOData):
-        if vert == vertex:
-            return i
-        
-    return -1
+	for i,vert in enumerate(VBOData):
+		if vert == vertex:
+			return i
+		
+	return -1
 
 def convertGeometryDataToVBOFormat(vertices, uvs, faces):
 
-    VBOData = []
-    indices = []
-    sameVertecies = 0
-    
-    for i,face in enumerate(faces):
-        
-        vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i * 3].s, uvs[i * 3].t)
-        index = checkIfVertexAlreadyExists(VBOData, vertexData)
-        if index != -1:
-            indices.append(index)
-            sameVertecies += 1
-        else:
-            indices.append((i * 3) - sameVertecies)
-            VBOData.append(vertexData)
-        
-        vertexData = VertexData(vertices[face.b].x, vertices[face.b].y, vertices[face.b].z, uvs[i * 3 + 1].s, uvs[i * 3 + 1].t)
-        index = checkIfVertexAlreadyExists(VBOData, vertexData)
-        if index != -1:
-            indices.append(index)
-            sameVertecies += 1
-        else:
-            indices.append((i * 3 + 1) - sameVertecies)
-            VBOData.append(vertexData)
-            
-        vertexData = VertexData(vertices[face.c].x, vertices[face.c].y, vertices[face.c].z, uvs[i * 3 + 2].s, uvs[i * 3 + 2].t)
-        index = checkIfVertexAlreadyExists(VBOData, vertexData)
-        if index != -1:
-            indices.append(index)
-            sameVertecies += 1
-        else:
-            indices.append((i * 3 + 2) - sameVertecies)
-            VBOData.append(vertexData)
-    
-    return [ VBOData, indices ] 
+	VBOData = []
+	indices = []
+	sameVertecies = 0
+	
+	for i,face in enumerate(faces):
+		
+		vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i * 3].s, uvs[i * 3].t)
+		index = checkIfVertexAlreadyExists(VBOData, vertexData)
+		if index != -1:
+			indices.append(index)
+			sameVertecies += 1
+		else:
+			indices.append((i * 3) - sameVertecies)
+			VBOData.append(vertexData)
+		
+		vertexData = VertexData(vertices[face.b].x, vertices[face.b].y, vertices[face.b].z, uvs[i * 3 + 1].s, uvs[i * 3 + 1].t)
+		index = checkIfVertexAlreadyExists(VBOData, vertexData)
+		if index != -1:
+			indices.append(index)
+			sameVertecies += 1
+		else:
+			indices.append((i * 3 + 1) - sameVertecies)
+			VBOData.append(vertexData)
+			
+		vertexData = VertexData(vertices[face.c].x, vertices[face.c].y, vertices[face.c].z, uvs[i * 3 + 2].s, uvs[i * 3 + 2].t)
+		index = checkIfVertexAlreadyExists(VBOData, vertexData)
+		if index != -1:
+			indices.append(index)
+			sameVertecies += 1
+		else:
+			indices.append((i * 3 + 2) - sameVertecies)
+			VBOData.append(vertexData)
+	
+	return [ VBOData, indices ] 
 
 class ExportOrelliusMesh(bpy.types.Operator, ExportHelper):
 	"""Export Orellius mesh"""
@@ -103,7 +103,7 @@ class ExportOrelliusMesh(bpy.types.Operator, ExportHelper):
 
 def save(operator, context, filepath):
 
-	filepath = os.fsencode("/home/lazar/Desktop/test.orl")
+	filepath = os.fsencode(filepath)
 	fp = open(filepath, 'w')
 
 	for sceneObject in bpy.context.scene.objects:
@@ -120,19 +120,19 @@ def save(operator, context, filepath):
 			mesh.to_mesh(sceneObject.data)
 
 			for vertex in sceneObject.data.vertices:
-				#fp.write("vertex " + str(vertex.co.x) + " " + str(vertex.co.y) + " " + str(vertex.co.z) + "\n")
+				print("vertex " + str(vertex.co.x) + " " + str(vertex.co.y) + " " + str(vertex.co.z))
 				vertexObject = Vertex(vertex.co.x, vertex.co.y, vertex.co.z)
 				vertexList.append(vertexObject)
 
 			uv_layer = mesh.loops.layers.uv.active
 			for face in mesh.faces:
 				for vert in face.loops:
-					#fp.write("uv1 " + str(vert[uv_layer].uv.x) + " " + str(vert[uv_layer].uv.y) + "\n")
+					print("uv1 " + str(vert[uv_layer].uv.x) + " " + str(vert[uv_layer].uv.y))
 					uvObject = Uv(vert[uv_layer].uv.x, vert[uv_layer].uv.y)
 					uvList.append(uvObject)
 
 			for face in sceneObject.data.polygons:
-				#fp.write("face " + str(face.vertices[0]) + " " + str(face.vertices[1]) + " " + str(face.vertices[2]) + "\n")
+				print("face " + str(face.vertices[0]) + " " + str(face.vertices[1]) + " " + str(face.vertices[2]))
 				faceObject = Face(face.vertices[0], face.vertices[1], face.vertices[2])
 				faceList.append(faceObject)
 
