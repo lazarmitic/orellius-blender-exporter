@@ -22,14 +22,24 @@ class Uv(object):
         self.s = s
         self.t = t
 
+class Normal(object):
+    
+    def __init__(self, nx, ny, nz):
+        self.nx = nx
+        self.ny = ny
+        self.nz = nz
+
 class VertexData(object):
     
-    def __init__(self, x, y, z, s, t):
+    def __init__(self, x, y, z, s, t, nx, ny, nz):
         self.x = x
         self.y = y
         self.z = z
         self.s = s
         self.t = t
+        self.nx = nx
+        self.ny = ny
+        self.nz = nz
         
     def __eq__(self, other): 
         return self.__dict__ == other.__dict__
@@ -42,7 +52,7 @@ def checkIfVertexAlreadyExists(VBOData, vertex):
         
     return -1
 
-def convertGeometryDataToVBOFormat(vertices, uvs, faces):
+def convertGeometryDataToVBOFormat(vertices, uvs, faces, normals):
 
     VBOData = []
     indices = []
@@ -50,7 +60,7 @@ def convertGeometryDataToVBOFormat(vertices, uvs, faces):
     
     for i,face in enumerate(faces):
         
-        vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i * 3].s, uvs[i * 3].t)
+        vertexData = VertexData(vertices[face.a].x, vertices[face.a].y, vertices[face.a].z, uvs[i * 3].s, uvs[i * 3].t, normals[i].nx, normals[i].ny, normals[i].nz)
         index = checkIfVertexAlreadyExists(VBOData, vertexData)
         if index != -1:
             print("index " + str(index))
@@ -61,7 +71,7 @@ def convertGeometryDataToVBOFormat(vertices, uvs, faces):
             indices.append((i * 3) - sameVertecies)
             VBOData.append(vertexData)
         
-        vertexData = VertexData(vertices[face.b].x, vertices[face.b].y, vertices[face.b].z, uvs[i * 3 + 1].s, uvs[i * 3 + 1].t)
+        vertexData = VertexData(vertices[face.b].x, vertices[face.b].y, vertices[face.b].z, uvs[i * 3 + 1].s, uvs[i * 3 + 1].t, normals[i].nx, normals[i].ny, normals[i].nz)
         index = checkIfVertexAlreadyExists(VBOData, vertexData)
         if index != -1:
             indices.append(index)
@@ -70,7 +80,7 @@ def convertGeometryDataToVBOFormat(vertices, uvs, faces):
             indices.append((i * 3 + 1) - sameVertecies)
             VBOData.append(vertexData)
             
-        vertexData = VertexData(vertices[face.c].x, vertices[face.c].y, vertices[face.c].z, uvs[i * 3 + 2].s, uvs[i * 3 + 2].t)
+        vertexData = VertexData(vertices[face.c].x, vertices[face.c].y, vertices[face.c].z, uvs[i * 3 + 2].s, uvs[i * 3 + 2].t, normals[i].nx, normals[i].ny, normals[i].nz)
         index = checkIfVertexAlreadyExists(VBOData, vertexData)
         if index != -1:
             indices.append(index)
@@ -93,6 +103,7 @@ for sceneObject in bpy.context.scene.objects:
         vertexList = []
         uvList = []
         faceList = []
+        normalList = []
 
         mesh = bmesh.new()
         mesh.from_mesh(sceneObject.data)
@@ -116,10 +127,15 @@ for sceneObject in bpy.context.scene.objects:
             faceObject = Face(face.vertices[0], face.vertices[1], face.vertices[2])
             faceList.append(faceObject)
 
-        [ VBO, indices ] = convertGeometryDataToVBOFormat(vertexList, uvList, faceList)
+        for face in sceneObject.data.polygons:
+            print("normal " + str(face.normal.x) + " " + str(face.normal.y) + " " + str(face.normal.z))
+            normalObject = Normal(face.normal.x, face.normal.y, face.normal.z)
+            normalList.append(normalObject)
+
+        [ VBO, indices ] = convertGeometryDataToVBOFormat(vertexList, uvList, faceList, normalList)
         
         for vboEntry in VBO:
-            fp.write("v " + str(round(vboEntry.x, 2)) + " " + str(round(vboEntry.y, 2)) + " " + str(round(vboEntry.z, 2)) + " " + str(round(vboEntry.s, 3)) + " " + str(round(vboEntry.t, 3)) + "\n")
+            fp.write("v " + str(round(vboEntry.x, 2)) + " " + str(round(vboEntry.y, 2)) + " " + str(round(vboEntry.z, 2)) + " " + str(round(vboEntry.s, 3)) + " " + str(round(vboEntry.t, 3)) + " " + str(round(vboEntry.nx)) + " " +  str(round(vboEntry.ny)) + " " + str(round(vboEntry.nz)) + "\n")
         
         fp.write("i ")
         for indice in indices:
