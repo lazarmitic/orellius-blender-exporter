@@ -13,8 +13,8 @@ class Vertex(object):
 
     def __init__(self, x, y, z):
         self.x = x
-        self.y = y
-        self.z = z
+        self.y = z
+        self.z = y
 
 class Uv(object):
 
@@ -26,8 +26,8 @@ class Normal(object):
     
     def __init__(self, nx, ny, nz):
         self.nx = nx
-        self.ny = ny
-        self.nz = nz
+        self.ny = nz
+        self.nz = ny
 
 class VertexData(object):
     
