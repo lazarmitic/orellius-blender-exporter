@@ -167,7 +167,10 @@ def save(operator, context, filepath):
 				for texture in material.material.texture_slots:
 					if texture:
 						if hasattr(texture.texture, "image"):
-							fp.write("diffuseTexture " + texture.texture.image.filepath + "\n")
+							if texture.use_map_color_diffuse:
+								fp.write("diffuseTexture " + texture.texture.image.filepath + "\n")
+							elif texture.use_map_color_spec:
+								fp.write("specularTexture " + texture.texture.image.filepath + "\n")
 
 			mesh.free()
 
