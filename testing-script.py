@@ -15,7 +15,7 @@ class Vertex(object):
     def __init__(self, x, y, z):
         self.x = x
         self.y = z
-        self.z = y
+        self.z = -y
 
 class Uv(object):
 
@@ -28,7 +28,7 @@ class Normal(object):
     def __init__(self, nx, ny, nz):
         self.nx = nx
         self.ny = nz
-        self.nz = ny
+        self.nz = -ny
 
 class VertexData(object):
     
@@ -156,6 +156,11 @@ for sceneObject in bpy.context.scene.objects:
                             with open(texture.texture.image.filepath, "rb") as image_file:
                                 encoded_string = base64.b64encode(image_file.read()).decode("ascii")
                                 fp.write("specularTexture " + "data:image/png;base64," + encoded_string + "\n")
+                                
+                        elif texture.use_map_normal:
+                            with open(texture.texture.image.filepath, "rb") as image_file:
+                                encoded_string = base64.b64encode(image_file.read()).decode("ascii")
+                                fp.write("normalTexture " + "data:image/png;base64," + encoded_string + "\n")
 
         mesh.free()
 
