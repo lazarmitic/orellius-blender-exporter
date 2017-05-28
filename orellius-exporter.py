@@ -163,14 +163,19 @@ def save(operator, context, filepath):
 				fp.write(str(indice) + " ")
 			fp.write("\n")
 			
-			for material in sceneObject.material_slots:
-				for texture in material.material.texture_slots:
-					if texture:
-						if hasattr(texture.texture, "image"):
-							if texture.use_map_color_diffuse:
-								fp.write("diffuseTexture " + texture.texture.image.filepath + "\n")
-							elif texture.use_map_color_spec:
-								fp.write("specularTexture " + texture.texture.image.filepath + "\n")
+		for material in sceneObject.material_slots:
+			for texture in material.material.texture_slots:
+				if texture:
+					if hasattr(texture.texture, "image"):
+						if texture.use_map_color_diffuse:
+							with open(texture.texture.image.filepath, "rb") as image_file:
+								encoded_string = base64.b64encode(image_file.read()).decode("ascii")
+								fp.write("diffuseTexture " + "data:image/png;base64," + encoded_string + "\n")
+							
+						elif texture.use_map_color_spec:
+							with open(texture.texture.image.filepath, "rb") as image_file:
+								encoded_string = base64.b64encode(image_file.read()).decode("ascii")
+								fp.write("specularTexture " + "data:image/png;base64," + encoded_string + "\n")
 
 			mesh.free()
 

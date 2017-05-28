@@ -1,6 +1,7 @@
 import bpy
 import bmesh
 import os
+import base64
 
 class Face(object):
 
@@ -147,9 +148,14 @@ for sceneObject in bpy.context.scene.objects:
                 if texture:
                     if hasattr(texture.texture, "image"):
                         if texture.use_map_color_diffuse:
-                            fp.write("diffuseTexture " + texture.texture.image.filepath + "\n")
+                            with open(texture.texture.image.filepath, "rb") as image_file:
+                                encoded_string = base64.b64encode(image_file.read()).decode("ascii")
+                                fp.write("diffuseTexture " + "data:image/png;base64," + encoded_string + "\n")
+                            
                         elif texture.use_map_color_spec:
-                            fp.write("specularTexture " + texture.texture.image.filepath + "\n")
+                            with open(texture.texture.image.filepath, "rb") as image_file:
+                                encoded_string = base64.b64encode(image_file.read()).decode("ascii")
+                                fp.write("specularTexture " + "data:image/png;base64," + encoded_string + "\n")
 
         mesh.free()
 
